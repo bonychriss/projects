@@ -621,7 +621,6 @@
       const sp = 4 + Math.random() * 10;
       parts.push(makePiece(x, y, Math.cos(a) * sp, Math.sin(a) * sp - 6));
     }
-    popSound(Math.min(n / 160, 1));
     startConfetti();
   }
 
@@ -629,7 +628,6 @@
     for (let i = 0; i < n; i++) {
       parts.push(makePiece(Math.random() * innerWidth, -20 - Math.random() * innerHeight, (Math.random() - .5) * 2, 2 + Math.random() * 3));
     }
-    shimmerSound(Math.min(n / 260, 1));
     startConfetti();
   }
 
@@ -766,8 +764,6 @@
 
   /* ---------- Sound effects ---------- */
   let sfxOut = null, noiseBuf = null;
-  // C major pentatonic (C6–E7) so the twinkles always fit the song
-  const SPARKLE = [1046.5, 1174.7, 1318.5, 1568, 1760, 2093, 2349.3, 2637];
 
   function sfxBus() {
     if (!sfxOut) {
@@ -819,38 +815,27 @@
     o.stop(t + dur + .05);
   }
 
-  function sparkles(count, spread, vol = .12) {
-    const t0 = audio.currentTime + .02;
+  function crackle(t0, count, spread) {
     for (let i = 0; i < count; i++) {
-      const t = t0 + Math.random() * spread;
-      const f = SPARKLE[(Math.random() * SPARKLE.length) | 0];
-      tone(t, f, .35, vol);
-      tone(t, f * 2, .15, vol * .3);
+      noise(t0 + Math.random() * spread, .03, "highpass", 3000 + Math.random() * 3000, .2 + Math.random() * .2);
     }
   }
 
-  // Party-popper bang + twinkles; size 0..1
-  function popSound(size) {
-    if (!getAudio()) return;
-    const t = audio.currentTime + .01;
+  // Bang with a firework-style crackle tail; size 0..1
+  function popSound(t, size) {
     const level = .4 + size * .6;
     noise(t, .12 + size * .1, "bandpass", 1800, .6 * level, .002, .8);
     tone(t, 180, .18, .5 * level, "sine", 45);
-    sparkles(Math.round(4 + size * 10), .6 + size * .8);
+    crackle(t + .08, Math.round(6 + size * 14), .5 + size * .6);
   }
 
-  // Fizzy shimmer for falling confetti; size 0..1
-  function shimmerSound(size) {
+  function burstSound(pops = 1) {
     if (!getAudio()) return;
-    noise(audio.currentTime + .01, 1.4, "highpass", 6000, .05, .3);
-    sparkles(Math.round(8 + size * 14), 1.8, .08);
-  }
-
-  function whooshSound() {
-    if (!getAudio()) return;
-    const t = audio.currentTime + .01;
-    const f = noise(t, .45, "bandpass", 900, .35, .08, .7);
-    f.frequency.exponentialRampToValueAtTime(300, t + .45);
+    let t = audio.currentTime + .01;
+    for (let i = 0; i < pops; i++) {
+      popSound(t, i ? .6 : 1);
+      t += .25 + Math.random() * .15;
+    }
   }
 
   /* ---------- 1. Gift ---------- */
@@ -862,6 +847,7 @@
     gift.classList.add("open");
     const r = gift.getBoundingClientRect();
     burst(r.left + r.width / 2, r.top + r.height / 2, 160);
+    burstSound(1);
     if (navigator.vibrate) navigator.vibrate(60);
     playSong();
     setTimeout(() => show("screen-cake"), 1300);
@@ -907,7 +893,6 @@
     const smoke = document.createElement("div");
     smoke.className = "smoke";
     c.appendChild(smoke);
-    whooshSound();
     if (navigator.vibrate) navigator.vibrate(20);
     candlesOut++;
     if (candlesOut === CONFIG.candles) {
@@ -916,6 +901,7 @@
         const r = $("#candles").getBoundingClientRect();
         burst(r.left + r.width / 2, r.top, 140);
         rain(160);
+        burstSound(3);
         $("#toLetter").classList.remove("pending");
       }, 450);
     }
@@ -989,6 +975,7 @@
     "screen-letter": revealLetter,
     "screen-final": () => {
       rain(260);
+      burstSound(2);
       setTimeout(() => rain(160), 1800);
     }
   };
