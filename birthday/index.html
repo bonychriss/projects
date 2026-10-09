@@ -198,6 +198,7 @@
     position: relative;
     width: 260px; height: 220px;
     margin: 64px auto 0;
+    cursor: pointer;
   }
   .plate {
     position: absolute;
@@ -535,7 +536,7 @@
       <div class="tier bottom" id="tierBottom"><div class="cake-text nm"></div></div>
       <div class="plate"></div>
     </div>
-    <p class="hint" id="cakeHint">Make a wish, then tap the candles to blow them out 🕯️</p>
+    <p class="hint" id="cakeHint">Make a wish, then tap the cake to blow out the candles 🕯️</p>
     <button class="btn pending" id="toLetter">I wrote you a letter 💌</button>
   </div>
 </section>
@@ -963,6 +964,12 @@
   }
   buildCandles();
 
+  $(".cake").addEventListener("click", (e) => {
+    if (e.target.closest(".candle")) return;
+    const next = $("#candles .candle:not(.out)");
+    if (next) blowOut(next);
+  });
+
   $("#toLetter").addEventListener("click", () => show("screen-letter"));
 
   /* ---------- 3. Letter ---------- */
@@ -1019,7 +1026,7 @@
     giftOpened = false;
     gift.classList.remove("open");
     buildCandles();
-    $("#cakeHint").textContent = "Make a wish, then tap the candles to blow them out 🕯️";
+    $("#cakeHint").textContent = "Make a wish, then tap the cake to blow out the candles 🕯️";
     $("#toLetter").classList.add("pending");
     $("#toFinal").classList.add("pending");
     $$(".card").forEach(c => c.classList.remove("flipped"));
