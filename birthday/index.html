@@ -621,6 +621,7 @@
       const sp = 4 + Math.random() * 10;
       parts.push(makePiece(x, y, Math.cos(a) * sp, Math.sin(a) * sp - 6));
     }
+    popSound(Math.min(n / 160, 1));
     startConfetti();
   }
 
@@ -628,6 +629,7 @@
     for (let i = 0; i < n; i++) {
       parts.push(makePiece(Math.random() * innerWidth, -20 - Math.random() * innerHeight, (Math.random() - .5) * 2, 2 + Math.random() * 3));
     }
+    shimmerSound(Math.min(n / 260, 1));
     startConfetti();
   }
 
@@ -695,13 +697,18 @@
     silentEl.play().catch(() => {});
   }
 
+  function getAudio() {
+    unlockIOSAudio();
+    if (!audio) {
+      try { audio = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; }
+    }
+    if (audio.state !== "running") audio.resume();
+    return audio;
+  }
+
   function playSong() {
     stopSong();
-    unlockIOSAudio();
-    try {
-      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
-    } catch (e) { return; }
-    if (audio.state !== "running") audio.resume();
+    if (!getAudio()) return;
 
     master = audio.createGain();
     master.gain.value = .22;
@@ -757,6 +764,95 @@
     if (!document.hidden && playing && audio && audio.state !== "running") audio.resume();
   });
 
+  /* ---------- Sound effects ---------- */
+  let sfxOut = null, noiseBuf = null;
+  // C major pentatonic (C6–E7) so the twinkles always fit the song
+  const SPARKLE = [1046.5, 1174.7, 1318.5, 1568, 1760, 2093, 2349.3, 2637];
+
+  function sfxBus() {
+    if (!sfxOut) {
+      sfxOut = audio.createGain();
+      sfxOut.gain.value = .5;
+      sfxOut.connect(audio.destination);
+      const n = audio.sampleRate;
+      noiseBuf = audio.createBuffer(1, n, n);
+      const d = noiseBuf.getChannelData(0);
+      for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+    }
+    return sfxOut;
+  }
+
+  function noise(t, dur, type, freq, vol, attack = .002, q = 1) {
+    const out = sfxBus();
+    const src = audio.createBufferSource();
+    src.buffer = noiseBuf;
+    src.loop = true;
+    const f = audio.createBiquadFilter();
+    f.type = type;
+    f.frequency.value = freq;
+    f.Q.value = q;
+    const g = audio.createGain();
+    g.gain.setValueAtTime(.0001, t);
+    g.gain.linearRampToValueAtTime(vol, t + attack);
+    g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    src.connect(f);
+    f.connect(g);
+    g.connect(out);
+    src.start(t, Math.random() * .5);
+    src.stop(t + dur + .05);
+    return f;
+  }
+
+  function tone(t, freq, dur, vol, type = "sine", endFreq) {
+    const out = sfxBus();
+    const o = audio.createOscillator();
+    const g = audio.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(freq, t);
+    if (endFreq) o.frequency.exponentialRampToValueAtTime(endFreq, t + dur);
+    g.gain.setValueAtTime(.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + .005);
+    g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    o.connect(g);
+    g.connect(out);
+    o.start(t);
+    o.stop(t + dur + .05);
+  }
+
+  function sparkles(count, spread, vol = .12) {
+    const t0 = audio.currentTime + .02;
+    for (let i = 0; i < count; i++) {
+      const t = t0 + Math.random() * spread;
+      const f = SPARKLE[(Math.random() * SPARKLE.length) | 0];
+      tone(t, f, .35, vol);
+      tone(t, f * 2, .15, vol * .3);
+    }
+  }
+
+  // Party-popper bang + twinkles; size 0..1
+  function popSound(size) {
+    if (!getAudio()) return;
+    const t = audio.currentTime + .01;
+    const level = .4 + size * .6;
+    noise(t, .12 + size * .1, "bandpass", 1800, .6 * level, .002, .8);
+    tone(t, 180, .18, .5 * level, "sine", 45);
+    sparkles(Math.round(4 + size * 10), .6 + size * .8);
+  }
+
+  // Fizzy shimmer for falling confetti; size 0..1
+  function shimmerSound(size) {
+    if (!getAudio()) return;
+    noise(audio.currentTime + .01, 1.4, "highpass", 6000, .05, .3);
+    sparkles(Math.round(8 + size * 14), 1.8, .08);
+  }
+
+  function whooshSound() {
+    if (!getAudio()) return;
+    const t = audio.currentTime + .01;
+    const f = noise(t, .45, "bandpass", 900, .35, .08, .7);
+    f.frequency.exponentialRampToValueAtTime(300, t + .45);
+  }
+
   /* ---------- 1. Gift ---------- */
   const gift = $("#gift");
   let giftOpened = false;
@@ -811,6 +907,7 @@
     const smoke = document.createElement("div");
     smoke.className = "smoke";
     c.appendChild(smoke);
+    whooshSound();
     if (navigator.vibrate) navigator.vibrate(20);
     candlesOut++;
     if (candlesOut === CONFIG.candles) {
