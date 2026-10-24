@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getAudio, isPlaying, pauseSong, playSong } from './music'
+import { autoplayOnOpen, getAudio, isPlaying, pauseSong, playSong } from './music'
 import './App.css'
 
 const REASONS = [
@@ -24,6 +24,10 @@ export default function App() {
     const sync = () => setPlaying(isPlaying())
     a.addEventListener('play', sync)
     a.addEventListener('pause', sync)
+
+    // Start our song as soon as the page opens (gesture unlock if blocked).
+    autoplayOnOpen(setPlaying)
+
     return () => {
       a.removeEventListener('play', sync)
       a.removeEventListener('pause', sync)
