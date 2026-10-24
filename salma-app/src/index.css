@@ -1,14 +1,13 @@
 :root {
-  --sky: #dceaf2;
-  --sky-deep: #b9d4e4;
-  --sand: #f4efe6;
-  --paper: #fbf8f3;
-  --ink: #243038;
-  --ink-soft: #4a5a64;
-  --clay: #c56b5c;
-  --seafoam: #6f9e96;
-  --foam: #e8f2ef;
-  --display: "Fraunces", Georgia, serif;
+  --blush: #f9e1e4;
+  --ink: #2b2f3a;
+  --ink-soft: #4a4a5a;
+  --rose: #b53d58;
+  --rose-soft: #c9566d;
+  --rose-light: #e49aab;
+  --cream: #fffaf6;
+  --display: "Fraunces", "Playfair Display", Georgia, serif;
+  --script: "Caveat", "Segoe Script", cursive;
   --sans: "Manrope", system-ui, sans-serif;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -28,15 +27,16 @@ body,
 }
 
 body {
-  font-family: var(--sans);
+  font-family: var(--display);
   color: var(--ink);
-  background: var(--sky);
+  background: var(--blush);
+  overflow: hidden;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
 button {
-  font: inherit;
+  font-family: var(--display);
   color: inherit;
   cursor: pointer;
   border: none;
@@ -44,11 +44,10 @@ button {
 }
 
 button:focus-visible {
-  outline: 2px solid var(--seafoam);
+  outline: 2px solid var(--rose-soft);
   outline-offset: 3px;
 }
 
 img {
-  max-width: 100%;
   display: block;
 }
