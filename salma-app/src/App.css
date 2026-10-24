@@ -386,9 +386,21 @@
   width: 100%;
 }
 
-.mail-card {
+.mail-float {
   width: min(100%, 320px);
   margin: 0 auto;
+  animation: mailFloat 3.2s ease-in-out infinite;
+}
+
+@keyframes mailFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.mail-card {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
   aspect-ratio: 1.45;
   background: var(--paper);
   border: 1px solid rgba(36, 48, 56, 0.08);
@@ -400,23 +412,132 @@
   justify-content: space-between;
   padding: 1.75rem;
   text-align: left;
-  transition: transform 0.35s var(--ease);
+  animation: mailIn 0.8s var(--ease) both;
+  transition: transform 0.35s var(--ease), box-shadow 0.35s ease;
 }
 
-.mail:hover .mail-card {
-  transform: translateY(-4px) rotate(-0.6deg);
+@keyframes mailIn {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.94) rotate(-2deg);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(-0.4deg);
+  }
+}
+
+.mail:hover .mail-float,
+.mail:focus-visible .mail-float {
+  animation-play-state: paused;
+}
+
+.mail:hover .mail-card,
+.mail:focus-visible .mail-card {
+  transform: translateY(-4px) rotate(-1deg) scale(1.02);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.8) inset,
+    0 28px 56px rgba(36, 48, 56, 0.16);
+}
+
+.mail-shine {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.55) 48%,
+    transparent 62%
+  );
+  transform: translateX(-120%);
+  animation: mailShine 3.8s ease-in-out 1s infinite;
+  pointer-events: none;
+}
+
+@keyframes mailShine {
+  0%, 55% { transform: translateX(-120%); }
+  75%, 100% { transform: translateX(120%); }
 }
 
 .mail-to {
+  position: relative;
+  z-index: 1;
   font-family: var(--display);
   font-size: 1.75rem;
   font-weight: 600;
+  animation: mailTextIn 0.7s 0.25s var(--ease) both;
 }
 
 .mail-from {
+  position: relative;
+  z-index: 1;
   font-size: 0.85rem;
   color: var(--ink-soft);
   letter-spacing: 0.06em;
+  animation: mailTextIn 0.7s 0.5s var(--ease) both;
+}
+
+@keyframes mailTextIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+.mail-seal {
+  position: absolute;
+  z-index: 2;
+  right: 1.25rem;
+  top: 50%;
+  translate: 0 -50%;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--paper);
+  background: radial-gradient(circle at 35% 30%, #d48476, var(--clay) 55%, #9e4f44);
+  box-shadow: 0 6px 16px rgba(158, 79, 68, 0.35);
+  animation: sealPulse 2.2s ease-in-out 0.7s infinite, mailTextIn 0.6s 0.4s var(--ease) both;
+}
+
+@keyframes sealPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 6px 16px rgba(158, 79, 68, 0.35); }
+  50% { transform: scale(1.08); box-shadow: 0 8px 22px rgba(158, 79, 68, 0.5); }
+}
+
+.mail-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  animation: mailTextIn 0.7s 0.65s var(--ease) both, hintBounce 1.8s ease-in-out 1.2s infinite;
+}
+
+.hint-hand {
+  display: block;
+  font-size: 1rem;
+  color: var(--seafoam);
+  animation: handNudge 1.8s ease-in-out infinite;
+}
+
+@keyframes hintBounce {
+  0%, 100% { opacity: 0.75; }
+  50% { opacity: 1; }
+}
+
+@keyframes handNudge {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(5px); }
 }
 
 .letter {

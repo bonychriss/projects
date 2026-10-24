@@ -139,11 +139,18 @@ export default function App() {
           <section className="panel letter-panel enter" key="letter">
             {!opened ? (
               <button type="button" className="mail" onClick={openLetter}>
-                <div className="mail-card">
-                  <span className="mail-to">To Salma</span>
-                  <span className="mail-from">from Chris</span>
+                <div className="mail-float">
+                  <div className="mail-card">
+                    <span className="mail-shine" aria-hidden="true" />
+                    <span className="mail-to">To Salma</span>
+                    <span className="mail-seal" aria-hidden="true">S</span>
+                    <span className="mail-from">from Chris</span>
+                  </div>
                 </div>
-                <p className="hint">Tap to open</p>
+                <p className="hint mail-hint">
+                  <span className="hint-hand" aria-hidden="true">↓</span>
+                  Tap to open
+                </p>
               </button>
             ) : (
               <article className="letter enter-fast">
