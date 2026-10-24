@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import LetterCard from './LetterCard.jsx'
+import ReasonArt from './ReasonArt.jsx'
 import { autoplayOnOpen, getAudio, isPlaying, pauseSong, playSong } from './music'
 import './App.css'
 
@@ -174,7 +175,10 @@ export default function App() {
                       onClick={() => revealReason(i)}
                     >
                       {open ? (
-                        <span className="reason-text">{text}</span>
+                        <span className="reason-open">
+                          <ReasonArt index={i} />
+                          <span className="reason-text">{text}</span>
+                        </span>
                       ) : (
                         <span className="reason-locked">
                           {String(i + 1).padStart(2, '0')} · reveal
