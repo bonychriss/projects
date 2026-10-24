@@ -153,25 +153,33 @@ export default function App() {
                 </p>
               </button>
             ) : (
-              <article className="letter enter-fast">
-                <h2>My dearest Salma,</h2>
-                <p>
-                  On your birthday I keep thinking about how lucky I am —
-                  not just to know you, but to get to love you.
-                </p>
-                <p>
-                  You make ordinary days feel brighter. Your laugh, your kindness,
-                  the way you see the world — all of it feels like home to me.
-                </p>
-                <p>
-                  I hope this year brings you every soft morning and every wild
-                  dream you deserve. I will be right here for all of it.
-                </p>
-                <footer>
-                  <span>Always yours,</span>
-                  <strong>Chris</strong>
+              <article className="letter">
+                <div className="letter-ornament" aria-hidden="true">✦</div>
+                <header className="letter-head">
+                  <p className="letter-date">For your birthday</p>
+                  <h2>My dearest Salma,</h2>
+                  <span className="letter-rule" aria-hidden="true" />
+                </header>
+                <div className="letter-body">
+                  <p className="letter-p" style={{ '--d': '0.15s' }}>
+                    On your birthday I keep thinking about how lucky I am —
+                    not just to know you, but to get to love you.
+                  </p>
+                  <p className="letter-p" style={{ '--d': '0.35s' }}>
+                    You make ordinary days feel brighter. Your laugh, your kindness,
+                    the way you see the world — all of it feels like home to me.
+                  </p>
+                  <p className="letter-p" style={{ '--d': '0.55s' }}>
+                    I hope this year brings you every soft morning and every wild
+                    dream you deserve. I will be right here for all of it.
+                  </p>
+                </div>
+                <footer className="letter-sign">
+                  <span className="letter-closing">Always yours,</span>
+                  <strong className="letter-name">Chris</strong>
+                  <span className="letter-heart" aria-hidden="true">♡</span>
                 </footer>
-                <button type="button" className="cta solid" onClick={goNext}>
+                <button type="button" className="letter-cta" onClick={goNext}>
                   Keep going
                   <span aria-hidden="true">→</span>
                 </button>
