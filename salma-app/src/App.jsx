@@ -1,10 +1,19 @@
 import { useEffect, useState } from 'react'
-import Scene from './Scene.jsx'
+import Scene, { preloadScenes } from './Scene.jsx'
 import { autoplayOnOpen, getAudio, isPlaying, pauseSong, playSong } from './music'
 import './App.css'
 
 const STEPS = ['hero', 'song', 'letter', 'wish', 'download']
 const SONG_URL = `${import.meta.env.BASE_URL}stupid-face.mp3`
+
+// Backgrounds for the pages after the cover, in the order she will see them.
+const LATER_SCENES = [
+  { wide: 'bg-song-wide.webp', tall: 'bg-song-tall.webp' },
+  { wide: 'bg-envelope-wide.webp', tall: 'bg-envelope-tall.webp' },
+  { wide: 'bg-letter-tall.webp' },
+  { wide: 'bg-wish-wide.webp', tall: 'bg-wish-tall.webp' },
+  { wide: 'bg-download-wide.webp', tall: 'bg-download-tall.webp' },
+]
 
 function fmtTime(s) {
   if (!Number.isFinite(s) || s < 0) return '0:00'
@@ -74,6 +83,12 @@ export default function App() {
     }
   }, [])
 
+  // Warm the cache for the remaining pages while she is still on the cover.
+  useEffect(() => {
+    const id = setTimeout(() => preloadScenes(LATER_SCENES), 400)
+    return () => clearTimeout(id)
+  }, [])
+
   function restart() {
     setOpened(false)
     setBlown(false)
@@ -117,7 +132,7 @@ export default function App() {
 
       {/* 1 — Cover */}
       {current === 'hero' && (
-        <Scene name="hero" wide="bg-hero-wide.jpg" tall="bg-hero-tall.jpg">
+        <Scene name="hero" wide="bg-hero-wide.webp" tall="bg-hero-tall.webp">
           <div className="hero-block enter">
             <span className="hero-heart" aria-hidden="true">♡</span>
             <h1 className="hero-name">Salma</h1>
@@ -135,7 +150,7 @@ export default function App() {
 
       {/* 2 — Our song */}
       {current === 'song' && (
-        <Scene name="song" wide="bg-song-wide.jpg" tall="bg-song-tall.jpg">
+        <Scene name="song" wide="bg-song-wide.webp" tall="bg-song-tall.webp">
           <div className="song-block enter">
             <h2 className="song-title">Our song</h2>
             <p className="song-artist">Abe Parker – Stupid Face</p>
@@ -154,7 +169,7 @@ export default function App() {
 
       {/* 3a — Envelope */}
       {current === 'letter' && !opened && (
-        <Scene name="envelope" wide="bg-envelope-wide.jpg" tall="bg-envelope-tall.jpg">
+        <Scene name="envelope" wide="bg-envelope-wide.webp" tall="bg-envelope-tall.webp">
           <button type="button" className="env-hit" onClick={() => setOpened(true)} aria-label="Open the letter">
             <span className="env-to enter">To you</span>
             <span className="env-from enter">from Bony</span>
@@ -167,7 +182,7 @@ export default function App() {
 
       {/* 3b — Letter */}
       {current === 'letter' && opened && (
-        <Scene name="letter" wide="bg-letter-tall.jpg" ratioWide={3 / 4}>
+        <Scene name="letter" wide="bg-letter-tall.webp" ratioWide={3 / 4}>
           <article className="letter-block enter">
             <h2 className="letter-title">
               <span className="lt-happy">Happy</span>
@@ -193,7 +208,7 @@ export default function App() {
 
       {/* 4 — Wish */}
       {current === 'wish' && (
-        <Scene name="wish" wide="bg-wish-wide.jpg" tall="bg-wish-tall.jpg">
+        <Scene name="wish" wide="bg-wish-wide.webp" tall="bg-wish-tall.webp">
           {/* flame drawn in code on top of the unlit candle in the artwork */}
           <div className={`flame-anchor ${blown ? 'blown' : ''}`} aria-hidden="true">
             <svg className="flame-svg" viewBox="0 0 40 70">
@@ -256,7 +271,7 @@ export default function App() {
 
       {/* 5 — Download our song */}
       {current === 'download' && (
-        <Scene name="download" wide="bg-download-wide.jpg" tall="bg-download-tall.jpg">
+        <Scene name="download" wide="bg-download-wide.webp" tall="bg-download-tall.webp">
           <div className="dl-block enter">
             <h1 className="dl-name">
               Salma<span className="dl-name-heart" aria-hidden="true">♡</span>

@@ -49,6 +49,25 @@
   inset: 0;
 }
 
+/* soft fade while the artwork decodes (no blank flash on slow connections) */
+.scene-img {
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+
+.scene.ready .scene-img {
+  opacity: 1;
+}
+
+.scene.loading .scene-content {
+  opacity: 0;
+}
+
+.scene.ready .scene-content {
+  opacity: 1;
+  transition: opacity 0.4s ease 0.1s;
+}
+
 /* ================= Shared ================= */
 .enter {
   animation: rise 0.9s var(--ease) both;
